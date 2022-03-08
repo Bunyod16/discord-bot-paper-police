@@ -44,6 +44,10 @@ def add_holder(user_id, addr):
         return (0)
     return (1)
 
+def get_all_holders():
+    docs = db.collection(HOLDER_COLLECTION).stream()
+    return (docs)
+
 def get_tx(user_id):
     user_id = str(user_id)
     doc_ref = db.collection(CURRENT_COLLECTION).document(user_id)
