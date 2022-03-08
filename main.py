@@ -109,7 +109,7 @@ async def check_current_holders():
                 await revoke_roles.check_bhead(member, nfts, bot)
             for role in member.roles:
                 has_holder_role = 0
-                if role.id not in [941898769526571079, 941898593051226113, 941898684201832559]:
+                if role.id in [941898769526571079, 941898593051226113, 941898684201832559]:
                     has_holder_role = 1
                 if (has_holder_role == 0):
                     delete_holder(member.id)
@@ -130,6 +130,8 @@ async def on_ready():
 async def timed_checker():
   print("Job started")
   await check_current_holders()
+  await delete_non_holders()
+
 
 bot.add_cog(general_commands())
 bot.run(get_token())
