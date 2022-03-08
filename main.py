@@ -1,12 +1,14 @@
 from tabnanny import check
 from discord.ext import commands, tasks
 from blockchain_utils import check_ownership, check_tx
-from utils import get_token, VERIFY_CHANNEL_ID, POLICY_ID, GUILD_ID, NFT_ATTRIBUTES, WHALE_REQ
+from utils import get_token, VERIFY_CHANNEL_ID, POLICY_ID, GUILD_ID, NFT_ATTRIBUTES, WHALE_REQ, tz
 from commands import general_commands
-from api_firestore import get_tx, delete_tx, generate_tx, add_holder, delete_holder, get_all_holders
+from api_firestore import get_tx, delete_tx, generate_tx, add_holder, delete_holder, get_all_holders, get_all_tx
 import messages
 import discord
 import revoke_roles
+from datetime import datetime, timezone
+import math
 
 PREFIX = ("~")
 intents = discord.Intents.default()
@@ -113,7 +115,34 @@ async def check_current_holders():
                     has_holder_role = 1
                 if (has_holder_role == 0):
                     delete_holder(member.id)
-                
+
+def get_remaining_time(info):
+    current_time = datetime.now(tz=timezone.utc)
+    target_time = datetime.strptime(
+			info, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+    difference =(target_time - current_time)
+    seconds = difference.total_seconds()
+    minutes = seconds / 60
+    hours = math.floor(minutes / 60)
+    minutes = math.floor(minutes - (hours * 60))
+    days = math.floor(hours / 24)
+    if (days >= 1):
+        hours += (days * 24)
+    if (hours < 0 or minutes < 0):
+        hours = 0
+        minutes = 0
+    return ({"hours":hours,"minutes":minutes})
+
+async def delete_old_tx():
+    txs = get_all_tx()
+    for tx in txs:
+        tx = tx.to_dict()
+        time = str(tx["time"])[:16]
+        remaining = get_remaining_time(time)
+        print(remaining)
+        if (remaining["hours"] == 0 and remaining["minutes"] == 0):
+            delete_tx(tx["user_id"])
+
 
 @bot.event
 async def on_ready():
@@ -128,9 +157,9 @@ async def on_ready():
 
 @tasks.loop(hours=3)
 async def timed_checker():
-  print("Job started")
+  print("Timed job started")
   await check_current_holders()
-  await delete_non_holders()
+  await delete_old_tx()
 
 
 bot.add_cog(general_commands())

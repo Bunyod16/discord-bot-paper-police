@@ -1,4 +1,12 @@
 import os
+from dateutil import tz
+from datetime import datetime
+
+tzstr = "UTC"
+tz = tz.gettz(tzstr)
+
+def now():
+  return datetime.now(tz)
 
 CURRENT_COLLECTION="current"
 HOLDER_COLLECTION="holder"

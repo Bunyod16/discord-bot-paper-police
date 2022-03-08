@@ -3,8 +3,9 @@ import os
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
-from utils import CURRENT_COLLECTION, HOLDER_COLLECTION
+from utils import CURRENT_COLLECTION, HOLDER_COLLECTION, now
 import random
+from datetime import timedelta
 
 db = firestore.Client()
 
@@ -18,6 +19,8 @@ def generate_tx(user_id):
     return (amount)
 
 def add_tx(user_id, tx_amount):
+    time = now()
+    time = time + timedelta(hours=1)
     user_id = str(user_id)
     tx_amount = float(tx_amount)
     try:
@@ -26,6 +29,7 @@ def add_tx(user_id, tx_amount):
         doc_ref.set({
             "user_id" : user_id,
             "tx_amount": tx_amount,
+            "time": str(time)
         })
     except:
         return (0)
@@ -46,6 +50,10 @@ def add_holder(user_id, addr):
 
 def get_all_holders():
     docs = db.collection(HOLDER_COLLECTION).stream()
+    return (docs)
+
+def get_all_tx():
+    docs = db.collection(CURRENT_COLLECTION).stream()
     return (docs)
 
 def get_tx(user_id):
