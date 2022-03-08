@@ -62,7 +62,8 @@ async def give_roles(user, addr):
 @bot.command()
 async def tx(message, *args):
         if (message.channel.id != int(VERIFY_CHANNEL_ID)):
-            await message.reply("Please this command in the `#wallet-verification` channel.")
+            await message.reply("Please use this command in the `#wallet-verification` channel.")
+            return
         if (len(args) != 1):
             await message.reply("Please provide your transaction hash, example `~tx 41nfa91u24bacml148gakf9391nd`")
             return
@@ -74,7 +75,7 @@ async def tx(message, *args):
         if (info["status"] == 1):
             await message.reply(messages.success_status())
             await give_roles(message.author,info["addr"])
-            await message.delete()
+            await message.message.delete()
         elif (info["status"] == 0):
             await message.reply(messages.wrong_amount_status())
         else:
