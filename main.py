@@ -36,20 +36,18 @@ async def assign_roles(data, user, addr, num):
     burning_head = guild.get_role(941898769526571079)
     golden_head = guild.get_role(941898593051226113)
     whale_role = guild.get_role(941898684201832559)
+    phc_holder_role = guild.get_role(950982464678002730)
+    await user.add_roles(phc_holder_role)
     if (num >= WHALE_REQ):
         await user.add_roles(whale_role)
-        delete_tx(user.id)
-        add_holder(user.id, addr)
     
     if (data == "Burning Head"):
         await user.add_roles(burning_head)
-        delete_tx(user.id)
-        add_holder(user.id, addr)
 
     if (data == "Golden Head"):
         await user.add_roles(golden_head)
-        delete_tx(user.id)
-        add_holder(user.id, addr)
+    delete_tx(user.id)
+    add_holder(user.id, addr)
 
 async def give_roles(user, addr):
     nfts = check_ownership(addr, POLICY_ID)
